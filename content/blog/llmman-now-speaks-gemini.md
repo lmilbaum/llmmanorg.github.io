@@ -41,8 +41,7 @@ Gemini's shape and the backend's.
 Images travel too: PNG, JPEG, WebP and GIF `inlineData` become data
 URIs the backend already knows how to read. A MIME type llmman doesn't
 support, or base64 that doesn't decode, is rejected at translation
-time with a clear error. That's better than failing further
-downstream, where it's harder to trace back to the image.
+time with a clear error instead of failing somewhere downstream.
 
 ## Tool calls that stay matched up
 
@@ -70,21 +69,6 @@ and `countTokens` gets an exact count from a one-token unstreamed
 completion against the backend's own tokenizer, reusing the prompt
 llama-server already has cached.
 
-## Why CI went red
-
-Right after #400 merged, `main` started failing: on the CPU-only CI
-runners, AGY 1.1.13 blocked on its own post-turn title request long
-enough to trip its own five-minute `--print-timeout` and exit 1.
-
-The auto-updater, not AGY itself, turned out to be the culprit. It was
-quietly replacing the pinned 1.1.13 binary with 1.2.2, which sends the
-title request in parallel instead of waiting on it — so CI's retries
-weren't even running the checksummed build.
-[#491](https://github.com/llmmanorg/llmman/pull/491) disables
-auto-update, pins CI to the (non-blocking) 1.2.2 binary with checksums,
-and gives AGY's own five-minute timeout more room against the
-harness's.
-
 ## One model, pinned
 
 AGY tucks a model name into the path of some of its own requests,
@@ -105,10 +89,8 @@ whatever backend actually answers the request.
 Launched through llmman against the real AGY 1.1.26 binary,
 `llama-server`, and a local `qwen3.5:9b`: asked for the word `pong`,
 got it back, and the prompt showed up in `llmman log` against the
-isolated AGY settings directory. That end-to-end run sits on top of
-unit and regression tests covering translation, image handling, tool
-constraints, ID correlation and fallback — 968 tests passing in CI
-before merge.
+isolated AGY settings directory, on top of unit and regression tests
+covering translation, images, tool constraints and ID correlation.
 
 Details are in
 [README.md#launch-an-integration](https://github.com/llmmanorg/llmman#launch-an-integration).
