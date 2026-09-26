@@ -84,14 +84,6 @@ goes anywhere else; any other provider key in that header is left
 alone. AGY can talk to llmman without llmman's key ever reaching
 whatever backend actually answers the request.
 
-## Verified against the real CLI
-
-Launched through llmman against the real AGY 1.1.26 binary,
-`llama-server`, and a local `qwen3.5:9b`: asked for the word `pong`,
-got it back, and the prompt showed up in `llmman log` against the
-isolated AGY settings directory, on top of unit and regression tests
-covering translation, images, tool constraints and ID correlation.
-
 Details are in
 [README.md#launch-an-integration](https://github.com/llmmanorg/llmman#launch-an-integration).
 Questions are welcome at
